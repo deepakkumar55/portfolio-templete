@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowRight, FaGithub, FaLinkedin, FaYoutube, FaCamera, FaCode, FaLaptopCode } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
-import { loadFull } from '@tsparticles/engine';
+import { loadFull } from "@tsparticles/engine";
 import { Engine } from '@tsparticles/engine';
 import Image from 'next/image';
 
