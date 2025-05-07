@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowRight, FaGithub, FaLinkedin, FaYoutube, FaCamera, FaCode, FaLaptopCode } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
-import { loadFull } from "@tsparticles/engine";
+import { loadAll } from "@tsparticles/all";
 import { Engine } from '@tsparticles/engine';
 import Image from 'next/image';
 
@@ -66,7 +66,7 @@ const Hero: React.FC = () => {
   const roles = ["Founder", "Developer", "UI/UX Designer", "Freelancer", "YouTuber", "Photographer"];
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const particlesInit = async (engine: Engine) => {
-    await loadFull(engine);
+    await loadAll(engine);
   };
   
   useEffect(() => {

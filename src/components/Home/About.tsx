@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FaCode, FaServer, FaMobileAlt, FaDesktop, FaDatabase, FaCog, FaCalendarAlt, FaGraduationCap, FaBriefcase } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
+import { loadAll } from "@tsparticles/all";
 import { Engine } from '@tsparticles/engine';
 
 // Skill component with cyberpunk-style progress bar
@@ -122,7 +122,7 @@ const About: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
   const particlesInit = async (engine: Engine) => {
-    await loadFull(engine);
+    await loadAll(engine);
   };
   
   // Skills data

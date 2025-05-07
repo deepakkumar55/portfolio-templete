@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Image from 'next/image';
 import { FaTimes, FaCamera, FaImage } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
+import { loadAll } from "@tsparticles/all";
 import { Engine } from '@tsparticles/engine';
 
 // Terminal-style section description
@@ -217,7 +217,7 @@ const Photos: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
   const particlesInit = async (engine: Engine) => {
-    await loadFull(engine);
+    await loadAll(engine);
   };
   
   // Sample photos data

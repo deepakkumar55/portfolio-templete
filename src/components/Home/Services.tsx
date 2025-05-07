@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { FaCode, FaPaintBrush, FaLaptopCode, FaYoutube, FaCamera, FaRocket } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
+import { loadAll } from "@tsparticles/all";
 import { Engine } from '@tsparticles/engine';
 
 // Floating tech icon component - matching hero style
@@ -179,7 +179,7 @@ const Services: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
   const particlesInit = async (engine: Engine) => {
-    await loadFull(engine);
+    await loadAll(engine);
   };
 
   return (

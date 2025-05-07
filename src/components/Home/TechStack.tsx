@@ -2,7 +2,7 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
+import { loadAll } from "@tsparticles/all";
 import { Engine } from '@tsparticles/engine';
 import { 
   SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiHtml5, SiCss3,
@@ -113,7 +113,7 @@ const TechStack: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
   const particlesInit = async (engine: Engine) => {
-    await loadFull(engine);
+    await loadAll(engine);
   };
   
   // Technology categories

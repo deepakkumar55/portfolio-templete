@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { FaGithub, FaExternalLinkAlt, FaTimes, FaCode, FaBookmark } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
+import { loadAll } from "@tsparticles/all";
 import { Engine } from '@tsparticles/engine';
 import Image from 'next/image';
 
@@ -281,7 +281,7 @@ const Projects: React.FC = () => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
   const particlesInit = async (engine: Engine) => {
-    await loadFull(engine);
+    await loadAll(engine);
   };
   
   // Sample projects data (replace with your actual projects)
