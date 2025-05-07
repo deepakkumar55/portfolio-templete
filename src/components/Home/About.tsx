@@ -2,9 +2,8 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FaCode, FaServer, FaMobileAlt, FaDesktop, FaDatabase, FaCog, FaCalendarAlt, FaGraduationCap, FaBriefcase } from 'react-icons/fa';
-import Particles from 'react-tsparticles';
-import { loadAll } from "@tsparticles/all";
-import { Engine } from '@tsparticles/engine';
+import { Particles } from "@tsparticles/react";
+import { particlesInit, baseParticlesConfig } from '@/utils/particlesConfig';
 
 // Skill component with cyberpunk-style progress bar
 const Skill: React.FC<{ 
@@ -120,11 +119,7 @@ const TerminalAbout: React.FC<{ text: string }> = ({ text }) => {
 const About: React.FC = () => {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
-  
-  const particlesInit = async (engine: Engine) => {
-    await loadAll(engine);
-  };
-  
+
   // Skills data
   const skills = [
     { name: "Frontend Development", level: 90, icon: <FaCode /> },
@@ -180,38 +175,11 @@ const About: React.FC = () => {
 
   return (
     <section id="about" className="py-24 relative overflow-hidden perspective-1000">
-      {/* Particles background - similar to other sections but with different parameters */}
+      {/* Particles background */}
       <Particles
         id="tsparticles-about"
         init={particlesInit}
-        options={{
-          fullScreen: { enable: false },
-          background: { color: { value: "#0a0a0a" } },
-          fpsLimit: 120,
-          particles: {
-            color: { value: "#6366f1" },
-            links: {
-              color: "#a855f7",
-              distance: 150,
-              enable: true,
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              direction: "none",
-              enable: true,
-              outModes: { default: "bounce" },
-              random: true,
-              speed: 0.6,
-              straight: false,
-            },
-            number: { density: { enable: true, area: 1200 }, value: 40 },
-            opacity: { value: 0.2 },
-            shape: { type: "circle" },
-            size: { value: { min: 1, max: 2 } },
-          },
-          detectRetina: true
-        }}
+        options={baseParticlesConfig}
         className="absolute inset-0 z-0"
       />
       

@@ -2,9 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { FaQuoteLeft, FaStar, FaStarHalf, FaChevronLeft, FaChevronRight, FaUser } from 'react-icons/fa';
-import Particles from 'react-tsparticles';
-import { loadAll } from "@tsparticles/all";
-import { Engine } from '@tsparticles/engine';
+import { Particles } from "@tsparticles/react";
+import { particlesInit, baseParticlesConfig } from '@/utils/particlesConfig';
 import Image from 'next/image';
 
 // Star rating component
@@ -236,10 +235,6 @@ const Testimonials: React.FC = () => {
   const goToNext = () => {
     setCurrentIndex(prev => (prev === testimonials.length - 1 ? 0 : prev + 1));
   };
-  
-  const particlesInit = async (engine: Engine) => {
-    await loadAll(engine);
-  };
 
   return (
     <section id="testimonials" className="py-24 relative overflow-hidden perspective-1000">
@@ -248,32 +243,12 @@ const Testimonials: React.FC = () => {
         id="tsparticles-testimonials"
         init={particlesInit}
         options={{
-          fullScreen: { enable: false },
-          background: { color: { value: "#0a0a0a" } },
-          fpsLimit: 120,
+          ...baseParticlesConfig,
           particles: {
-            color: { value: "#6366f1" },
-            links: {
-              color: "#a855f7",
-              distance: 150,
-              enable: true,
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              direction: "none",
-              enable: true,
-              outModes: { default: "bounce" },
-              random: true,
-              speed: 0.5,
-              straight: false,
-            },
+            ...baseParticlesConfig.particles,
+            speed: 0.5,
             number: { density: { enable: true, area: 1200 }, value: 40 },
-            opacity: { value: 0.2 },
-            shape: { type: "circle" },
-            size: { value: { min: 1, max: 2 } },
-          },
-          detectRetina: true
+          }
         }}
         className="absolute inset-0 z-0"
       />

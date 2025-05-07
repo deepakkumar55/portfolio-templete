@@ -2,9 +2,8 @@
 import React, { useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { FaCode, FaPaintBrush, FaLaptopCode, FaYoutube, FaCamera, FaRocket } from 'react-icons/fa';
-import Particles from 'react-tsparticles';
-import { loadAll } from "@tsparticles/all";
-import { Engine } from '@tsparticles/engine';
+import { Particles } from "@tsparticles/react";
+import { particlesInit, baseParticlesConfig } from '@/utils/particlesConfig';
 
 // Floating tech icon component - matching hero style
 const FloatingIconServices: React.FC<{ icon: React.ReactNode, position: string, size: number, delay: number }> = 
@@ -177,44 +176,25 @@ const Services: React.FC = () => {
   
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
-  
-  const particlesInit = async (engine: Engine) => {
-    await loadAll(engine);
-  };
 
   return (
     <section id="services" className="py-20 relative overflow-hidden perspective-1000">
-      {/* Particles background - similar to hero but with different parameters */}
+      {/* Particles background */}
       <Particles
         id="tsparticles-services"
         init={particlesInit}
         options={{
-          fullScreen: { enable: false },
-          background: { color: { value: "#0a0a0a" } },
-          fpsLimit: 120,
+          ...baseParticlesConfig,
           particles: {
+            ...baseParticlesConfig.particles,
             color: { value: "#a855f7" },
             links: {
               color: "#6366f1",
               distance: 200,
-              enable: true,
-              opacity: 0.2,
-              width: 1
             },
-            move: {
-              direction: "none",
-              enable: true,
-              outModes: { default: "bounce" },
-              random: true,
-              speed: 0.8,
-              straight: false,
-            },
+            speed: 0.8,
             number: { density: { enable: true, area: 1000 }, value: 60 },
-            opacity: { value: 0.2 },
-            shape: { type: "circle" },
-            size: { value: { min: 1, max: 2 } },
-          },
-          detectRetina: true
+          }
         }}
         className="absolute inset-0 z-0"
       />

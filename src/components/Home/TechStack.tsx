@@ -1,9 +1,8 @@
 "use client";
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import Particles from 'react-tsparticles';
-import { loadAll } from "@tsparticles/all";
-import { Engine } from '@tsparticles/engine';
+import { Particles } from "@tsparticles/react";
+import { particlesInit, baseParticlesConfig } from '@/utils/particlesConfig';
 import { 
   SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiHtml5, SiCss3,
   SiTailwindcss, SiNodedotjs, SiExpress, SiMongodb, SiPostgresql, SiPrisma,
@@ -112,10 +111,6 @@ const TechStack: React.FC = () => {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
-  const particlesInit = async (engine: Engine) => {
-    await loadAll(engine);
-  };
-  
   // Technology categories
   const techCategories = [
     {
@@ -167,37 +162,18 @@ const TechStack: React.FC = () => {
   
   return (
     <section id="tech-stack" className="py-24 relative overflow-hidden perspective-1000">
-      {/* Particles background - similar to other sections but with different parameters */}
+      {/* Particles background */}
       <Particles
         id="tsparticles-techstack"
         init={particlesInit}
         options={{
-          fullScreen: { enable: false },
-          background: { color: { value: "#0a0a0a" } },
-          fpsLimit: 120,
+          ...baseParticlesConfig,
           particles: {
+            ...baseParticlesConfig.particles,
             color: { value: "#a855f7" },
-            links: {
-              color: "#6366f1",
-              distance: 150,
-              enable: true,
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              direction: "none",
-              enable: true,
-              outModes: { default: "bounce" },
-              random: true,
-              speed: 0.7,
-              straight: false,
-            },
             number: { density: { enable: true, area: 1200 }, value: 50 },
-            opacity: { value: 0.2 },
-            shape: { type: "circle" },
-            size: { value: { min: 1, max: 2 } },
-          },
-          detectRetina: true
+            speed: 0.7,
+          }
         }}
         className="absolute inset-0 z-0"
       />

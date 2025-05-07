@@ -3,9 +3,8 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Image from 'next/image';
 import { FaTimes, FaCamera, FaImage } from 'react-icons/fa';
-import Particles from 'react-tsparticles';
-import { loadAll } from "@tsparticles/all";
-import { Engine } from '@tsparticles/engine';
+import { Particles } from "@tsparticles/react";
+import { particlesInit, baseParticlesConfig } from '@/utils/particlesConfig';
 
 // Terminal-style section description
 const TerminalDescription: React.FC<{ text: string }> = ({ text }) => {
@@ -216,10 +215,6 @@ const Photos: React.FC = () => {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
-  const particlesInit = async (engine: Engine) => {
-    await loadAll(engine);
-  };
-  
   // Sample photos data
   const photos: PhotoType[] = [
     {
@@ -314,32 +309,11 @@ const Photos: React.FC = () => {
         id="tsparticles-photos"
         init={particlesInit}
         options={{
-          fullScreen: { enable: false },
-          background: { color: { value: "#0a0a0a" } },
-          fpsLimit: 120,
+          ...baseParticlesConfig,
           particles: {
-            color: { value: "#6366f1" },
-            links: {
-              color: "#a855f7",
-              distance: 150,
-              enable: true,
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              direction: "none",
-              enable: true,
-              outModes: { default: "bounce" },
-              random: true,
-              speed: 0.5,
-              straight: false,
-            },
-            number: { density: { enable: true, area: 1200 }, value: 40 },
-            opacity: { value: 0.2 },
-            shape: { type: "circle" },
-            size: { value: { min: 1, max: 2 } },
-          },
-          detectRetina: true
+            ...baseParticlesConfig.particles,
+            speed: 0.5,
+          }
         }}
         className="absolute inset-0 z-0"
       />

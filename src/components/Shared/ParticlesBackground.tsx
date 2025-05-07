@@ -1,8 +1,7 @@
 "use client";
 import React from 'react';
-import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
-import { Engine } from '@tsparticles/engine';
+import { Particles } from "@tsparticles/react";
+import { particlesInit, baseParticlesConfig } from '@/utils/particlesConfig';
 
 interface ParticlesBackgroundProps {
   id: string;
@@ -13,62 +12,33 @@ interface ParticlesBackgroundProps {
 }
 
 const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({ 
-  id, 
-  particleColor = "#6366f1", 
+  id,
+  particleColor = "#6366f1",
   linkColor = "#a855f7",
   quantity = 60,
-  speed = 0.7
+  speed = 0.5
 }) => {
-  const particlesInit = async (engine: Engine) => {
-    await loadFull(engine);
-  };
-
   return (
     <Particles
       id={id}
       init={particlesInit}
       options={{
-        fullScreen: { enable: false },
-        background: { color: { value: "#0a0a0a" } },
-        fpsLimit: 120,
+        ...baseParticlesConfig,
         particles: {
+          ...baseParticlesConfig.particles,
           color: { value: particleColor },
           links: {
+            ...baseParticlesConfig.particles.links,
             color: linkColor,
-            distance: 150,
-            enable: true,
-            opacity: 0.2,
-            width: 1
           },
           move: {
-            direction: "none",
-            enable: true,
-            outModes: { default: "bounce" },
-            random: true,
+            ...baseParticlesConfig.particles.move,
             speed: speed,
-            straight: false,
           },
-          number: { density: { enable: true, area: 1200 }, value: quantity },
-          opacity: { value: 0.2 },
-          shape: { type: "circle" },
-          size: { value: { min: 1, max: 2 } },
-        },
-        detectRetina: true,
-        interactivity: {
-          events: {
-            onHover: {
-              enable: true,
-              mode: "grab"
-            }
+          number: { 
+            density: { enable: true, area: 1000 }, 
+            value: quantity 
           },
-          modes: {
-            grab: {
-              distance: 150,
-              links: {
-                opacity: 0.5
-              }
-            }
-          }
         }
       }}
       className="absolute inset-0 z-0"

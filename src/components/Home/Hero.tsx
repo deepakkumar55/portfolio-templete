@@ -2,9 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowRight, FaGithub, FaLinkedin, FaYoutube, FaCamera, FaCode, FaLaptopCode } from 'react-icons/fa';
-import Particles from 'react-tsparticles';
-import { loadAll } from "@tsparticles/all";
-import { Engine } from '@tsparticles/engine';
+import { Particles } from "@tsparticles/react";
+import { particlesInit, baseParticlesConfig } from '@/utils/particlesConfig';
 import Image from 'next/image';
 
 const TerminalText: React.FC<{ text: string }> = ({ text }) => {
@@ -65,9 +64,6 @@ const FloatingIcon: React.FC<{ icon: React.ReactNode, delay: number }> = ({ icon
 const Hero: React.FC = () => {
   const roles = ["Founder", "Developer", "UI/UX Designer", "Freelancer", "YouTuber", "Photographer"];
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
-  const particlesInit = async (engine: Engine) => {
-    await loadAll(engine);
-  };
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -84,34 +80,14 @@ const Hero: React.FC = () => {
         id="tsparticles"
         init={particlesInit}
         options={{
-          fullScreen: { enable: false },
-          background: {
-            color: { value: "#0a0a0a" },
-          },
-          fpsLimit: 120,
+          ...baseParticlesConfig,
           particles: {
-            color: { value: "#6366f1" },
-            links: {
-              color: "#a855f7",
-              distance: 150,
-              enable: true,
-              opacity: 0.2,
-              width: 1
-            },
-            move: {
-              direction: "none",
-              enable: true,
-              outModes: { default: "bounce" },
-              random: true,
-              speed: 1,
-              straight: false,
-            },
+            ...baseParticlesConfig.particles,
             number: { density: { enable: true, area: 800 }, value: 80 },
             opacity: { value: 0.3 },
-            shape: { type: "circle" },
             size: { value: { min: 1, max: 3 } },
+            speed: 1,
           },
-          detectRetina: true,
           interactivity: {
             events: {
               onHover: {
