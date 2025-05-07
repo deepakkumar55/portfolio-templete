@@ -1,234 +1,351 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaGithub, FaStar, FaCodeBranch, FaEye, FaCode, FaSort, FaSearch, FaExternalLinkAlt } from 'react-icons/fa';
+import ParticlesBackground from '@/components/Shared/ParticlesBackground';
+import GitHubRepositoryCard from '@/components/GitHub/GitHubRepositoryCard';
+import GitHubStats from '@/components/GitHub/GitHubStats';
+import GitHubLoader from '@/components/GitHub/GitHubLoader';
 
-export const metadata: Metadata = {
-  title: "GitHub Projects | Deepak Kumar - Full-Stack Developer",
-  description: "Explore Deepak Kumar's open source contributions and GitHub repositories.",
-};
-
-type Repository = {
+// GitHub API types
+interface Repository {
   id: number;
   name: string;
   description: string;
+  html_url: string;
+  homepage: string;
+  stargazers_count: number;
+  forks_count: number;
+  watchers_count: number;
   language: string;
-  stars: number;
-  forks: number;
-  url: string;
-  isPopular?: boolean;
-};
+  topics: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface GitHubStats {
+  public_repos: number;
+  followers: number;
+  following: number;
+  public_gists: number;
+}
 
 export default function GitHubPage() {
-  // Example repositories - replace with your actual GitHub repositories or fetch from GitHub API
-  const repositories: Repository[] = [
-    {
-      id: 1,
-      name: "react-dashboard",
-      description: "A responsive admin dashboard template built with React, Tailwind CSS and TypeScript.",
-      language: "TypeScript",
-      stars: 52,
-      forks: 12,
-      url: "https://github.com/yourusername/react-dashboard",
-      isPopular: true
-    },
-    {
-      id: 2,
-      name: "next-auth-template",
-      description: "Starter template for Next.js applications with authentication using NextAuth.js.",
-      language: "TypeScript",
-      stars: 38,
-      forks: 8,
-      url: "https://github.com/yourusername/next-auth-template",
-      isPopular: true
-    },
-    {
-      id: 3,
-      name: "tailwind-components",
-      description: "Collection of reusable UI components built with Tailwind CSS.",
-      language: "JavaScript",
-      stars: 29,
-      forks: 5,
-      url: "https://github.com/yourusername/tailwind-components"
-    },
-    {
-      id: 4,
-      name: "portfolio-website",
-      description: "Personal portfolio website built with Next.js and Tailwind CSS.",
-      language: "TypeScript",
-      stars: 17,
-      forks: 4,
-      url: "https://github.com/yourusername/portfolio-website"
-    },
-    {
-      id: 5,
-      name: "node-express-api",
-      description: "RESTful API template using Node.js, Express, and MongoDB.",
-      language: "JavaScript",
-      stars: 24,
-      forks: 7,
-      url: "https://github.com/yourusername/node-express-api"
-    },
-    {
-      id: 6,
-      name: "react-native-todo",
-      description: "Simple todo application built with React Native and Expo.",
-      language: "JavaScript",
-      stars: 15,
-      forks: 2,
-      url: "https://github.com/yourusername/react-native-todo"
-    },
-    {
-      id: 7,
-      name: "graphql-server",
-      description: "GraphQL server implementation with Apollo and MongoDB.",
-      language: "TypeScript",
-      stars: 19,
-      forks: 3,
-      url: "https://github.com/yourusername/graphql-server"
-    },
-    {
-      id: 8,
-      name: "webpack-boilerplate",
-      description: "Modern webpack configuration boilerplate for JavaScript projects.",
-      language: "JavaScript",
-      stars: 11,
-      forks: 3,
-      url: "https://github.com/yourusername/webpack-boilerplate"
-    }
-  ];
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [filteredRepos, setFilteredRepos] = useState<Repository[]>([]);
+  const [stats, setStats] = useState<GitHubStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('updated');
+  const [filterLanguage, setFilterLanguage] = useState('All');
+  const sectionRef = useRef(null);
+  const username = 'deepakkumar55';
 
-  // GitHub stats
-  const stats = {
-    repos: 32,
-    stars: 218,
-    followers: 76,
-    contributions: 843
-  };
+  // Languages from repositories
+  const languages = ['All', ...Array.from(new Set(repositories.map(repo => repo.language).filter(Boolean)))];
+
+  // Fetch GitHub profile and repositories
+  useEffect(() => {
+    const fetchGitHubData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch GitHub user data
+        const userResponse = await fetch(`https://api.github.com/users/${username}`);
+        if (!userResponse.ok) throw new Error('Failed to fetch GitHub profile');
+        const userData = await userResponse.json();
+        setStats({
+          public_repos: userData.public_repos,
+          followers: userData.followers,
+          following: userData.following,
+          public_gists: userData.public_gists
+        });
+        
+        // Fetch repositories
+        const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`);
+        if (!reposResponse.ok) throw new Error('Failed to fetch repositories');
+        const reposData = await reposResponse.json();
+        setRepositories(reposData);
+        setFilteredRepos(reposData);
+        
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch GitHub data. Please try again later.');
+        setLoading(false);
+      }
+    };
+    
+    fetchGitHubData();
+  }, [username]);
+
+  // Apply filters and sorting
+  useEffect(() => {
+    let results = [...repositories];
+    
+    // Apply language filter
+    if (filterLanguage !== 'All') {
+      results = results.filter(repo => repo.language === filterLanguage);
+    }
+    
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      results = results.filter(repo => 
+        repo.name.toLowerCase().includes(query) || 
+        (repo.description && repo.description.toLowerCase().includes(query)) ||
+        (repo.topics && repo.topics.some(topic => topic.toLowerCase().includes(query)))
+      );
+    }
+    
+    // Apply sorting
+    if (sortBy === 'stars') {
+      results.sort((a, b) => b.stargazers_count - a.stargazers_count);
+    } else if (sortBy === 'forks') {
+      results.sort((a, b) => b.forks_count - a.forks_count);
+    } else if (sortBy === 'updated') {
+      results.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    }
+    
+    setFilteredRepos(results);
+  }, [repositories, searchQuery, sortBy, filterLanguage]);
 
   return (
-    <div className="py-12 px-4 md:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            My <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">GitHub</span> Projects
-          </h1>
-          <p className="text-foreground/70 max-w-2xl mx-auto">
-            Explore my open source contributions and repositories on GitHub.
-          </p>
+    <main className="relative min-h-screen bg-gray-900 overflow-hidden">
+      {/* Particles Background */}
+      <ParticlesBackground 
+        id="github-particles" 
+        particleColor="#6366f1" 
+        linkColor="#6e56cf" 
+        quantity={70}
+      />
+      
+      {/* Cyberpunk grid effect */}
+      <div className="absolute inset-0 z-0 grid-bg"></div>
+      
+      {/* Background accents */}
+      <div className="absolute -left-64 top-1/3 w-96 h-96 bg-indigo-700/20 rounded-full blur-3xl"></div>
+      <div className="absolute -right-64 bottom-1/3 w-96 h-96 bg-purple-700/20 rounded-full blur-3xl"></div>
+      
+      <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
+        {/* GitHub header */}
+        <div className="text-center mb-16">
+          <div className="flex justify-center items-center mb-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-block text-6xl text-indigo-400 mr-4"
+            >
+              <FaGithub />
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="glitch-text-header text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-400 to-blue-400"
+              data-text="GitHub Profile"
+            >
+              GitHub Profile
+            </motion.h1>
+          </div>
+          
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent max-w-2xl mx-auto"
+          ></motion.div>
+          
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-6 text-gray-300 max-w-3xl mx-auto"
+          >
+            Explore my open-source projects and contributions. These repositories showcase my coding skills, 
+            problem-solving approach, and passion for software development.
+          </motion.p>
         </div>
         
         {/* GitHub Stats */}
-        <div className="flex flex-wrap justify-center gap-6 mb-16">
-          <div className="bg-white dark:bg-black border border-black/[.05] dark:border-white/[.1] rounded-xl p-6 shadow-sm text-center w-[180px]">
-            <h2 className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.repos}</h2>
-            <p className="text-foreground/70">Repositories</p>
-          </div>
-          <div className="bg-white dark:bg-black border border-black/[.05] dark:border-white/[.1] rounded-xl p-6 shadow-sm text-center w-[180px]">
-            <h2 className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.stars}</h2>
-            <p className="text-foreground/70">Stars</p>
-          </div>
-          <div className="bg-white dark:bg-black border border-black/[.05] dark:border-white/[.1] rounded-xl p-6 shadow-sm text-center w-[180px]">
-            <h2 className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.followers}</h2>
-            <p className="text-foreground/70">Followers</p>
-          </div>
-          <div className="bg-white dark:bg-black border border-black/[.05] dark:border-white/[.1] rounded-xl p-6 shadow-sm text-center w-[180px]">
-            <h2 className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.contributions}</h2>
-            <p className="text-foreground/70">Contributions</p>
-          </div>
-        </div>
-
-        <h2 className="text-2xl font-bold mb-6">Popular Repositories</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
-          {repositories.filter(repo => repo.isPopular).map((repo) => (
-            <div 
-              key={repo.id} 
-              className="bg-white dark:bg-black border border-black/[.05] dark:border-white/[.1] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-bold text-xl text-blue-600 dark:text-blue-400">{repo.name}</h3>
-                <div className="flex space-x-3">
-                  <span className="flex items-center text-foreground/60 text-sm">
-                    <svg className="w-4 h-4 mr-1" viewBox="0 0 16 16" fill="currentColor">
-                      <path fillRule="evenodd" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"></path>
-                    </svg>
-                    {repo.stars}
-                  </span>
-                  <span className="flex items-center text-foreground/60 text-sm">
-                    <svg className="w-4 h-4 mr-1" viewBox="0 0 16 16" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z"></path>
-                    </svg>
-                    {repo.forks}
-                  </span>
-                </div>
-              </div>
-              <p className="text-foreground/70 mb-4">{repo.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="px-2 py-1 text-xs font-medium bg-black/[.05] dark:bg-white/[.06] rounded">
-                  {repo.language}
-                </span>
-                <Link
-                  href={repo.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline flex items-center"
-                >
-                  View Repository
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H3a1 1 0 110-2h9.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <h2 className="text-2xl font-bold mb-6">All Repositories</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {repositories.map((repo) => (
-            <div 
-              key={repo.id} 
-              className="bg-white dark:bg-black border border-black/[.05] dark:border-white/[.1] rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-bold text-lg mb-2">{repo.name}</h3>
-              <p className="text-sm text-foreground/70 mb-3 line-clamp-2">{repo.description}</p>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <span className="flex items-center text-foreground/60 text-xs">
-                    <svg className="w-3 h-3 mr-1" viewBox="0 0 16 16" fill="currentColor">
-                      <path fillRule="evenodd" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"></path>
-                    </svg>
-                    {repo.stars}
-                  </span>
-                  <span className="flex items-center text-foreground/60 text-xs">
-                    <svg className="w-3 h-3 mr-1" viewBox="0 0 16 16" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z"></path>
-                    </svg>
-                    {repo.forks}
-                  </span>
-                  <span className="px-1.5 py-0.5 text-xs bg-black/[.05] dark:bg-white/[.06] rounded">
-                    {repo.language}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="mt-8 text-center">
-          <Link 
-            href="https://github.com/yourusername"
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors inline-flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-base h-12 px-6"
-            target="_blank"
-            rel="noopener noreferrer"
+        {!loading && stats && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mb-12"
           >
-            View GitHub Profile
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H3a1 1 0 110-2h9.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </Link>
-        </div>
+            <GitHubStats stats={stats} username={username} />
+          </motion.div>
+        )}
+        
+        {/* Filters and Search */}
+        {!loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="mb-8 flex flex-col md:flex-row justify-between items-center gap-4"
+          >
+            {/* Language filter */}
+            <div className="flex items-center space-x-2 w-full md:w-auto">
+              <span className="text-gray-400 text-sm whitespace-nowrap">Filter by:</span>
+              <select
+                value={filterLanguage}
+                onChange={(e) => setFilterLanguage(e.target.value)}
+                className="bg-gray-800 border border-gray-700 text-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                {languages.map(language => (
+                  <option key={language || 'null'} value={language}>
+                    {language || 'Other'}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Sort options */}
+            <div className="flex items-center space-x-2 w-full md:w-auto">
+              <span className="text-gray-400 text-sm whitespace-nowrap">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-gray-800 border border-gray-700 text-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="updated">Recently Updated</option>
+                <option value="stars">Stars</option>
+                <option value="forks">Forks</option>
+              </select>
+            </div>
+            
+            {/* Search box */}
+            <div className="relative w-full md:w-auto flex-1 max-w-md">
+              <input
+                type="text"
+                placeholder="Search repositories..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-800/80 border border-gray-700 text-gray-300 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-500" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+        
+        {/* Loading state */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-16">
+            <GitHubLoader />
+            <p className="mt-4 text-gray-400">Loading GitHub repositories...</p>
+          </div>
+        )}
+        
+        {/* Error state */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16 bg-gray-900/80 backdrop-blur-md rounded-xl border border-red-500/30"
+          >
+            <h3 className="text-2xl font-bold text-red-400 mb-3">Error</h3>
+            <p className="text-gray-400 max-w-md mx-auto">{error}</p>
+          </motion.div>
+        )}
+        
+        {/* Repository grid */}
+        {!loading && !error && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            >
+              <AnimatePresence>
+                {filteredRepos.map((repo, index) => (
+                  <GitHubRepositoryCard
+                    key={repo.id}
+                    repository={repo}
+                    index={index}
+                  />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+            
+            {/* Empty state */}
+            {filteredRepos.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16 backdrop-blur-md bg-gray-900/40 rounded-xl p-8 border border-gray-800"
+              >
+                <h3 className="text-2xl font-bold text-indigo-400 mb-3">No repositories found</h3>
+                <p className="text-gray-400 max-w-md mx-auto">
+                  No repositories match your current filters. Try adjusting your search criteria or explore different categories.
+                </p>
+              </motion.div>
+            )}
+          </>
+        )}
       </div>
-    </div>
+      
+      {/* CSS for styles */}
+      <style jsx>{`
+        .grid-bg {
+          background-image: 
+            linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
+          background-position: center center;
+        }
+        
+        .glitch-text-header {
+          position: relative;
+        }
+        
+        .glitch-text-header::before,
+        .glitch-text-header::after {
+          content: attr(data-text);
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: transparent;
+        }
+        
+        .glitch-text-header::before {
+          left: 2px;
+          text-shadow: -1px 0 #a855f7;
+          clip: rect(44px, 450px, 56px, 0);
+          animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch-text-header::after {
+          left: -2px;
+          text-shadow: -1px 0 #6366f1;
+          clip: rect(44px, 450px, 56px, 0);
+          animation: glitch-anim2 5s infinite linear alternate-reverse;
+          animation-delay: 0.1s;
+        }
+        
+        @keyframes glitch-anim {
+          0% { clip: rect(30px, 9999px, 10px, 0); }
+          5% { clip: rect(54px, 9999px, 98px, 0); }
+          /* ...other keyframes... */
+          100% { clip: rect(13px, 9999px, 71px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+          0% { clip: rect(86px, 9999px, 30px, 0); }
+          5% { clip: rect(12px, 9999px, 55px, 0); }
+          /* ...other keyframes... */
+          100% { clip: rect(38px, 9999px, 12px, 0); }
+        }
+      `}</style>
+    </main>
   );
 }

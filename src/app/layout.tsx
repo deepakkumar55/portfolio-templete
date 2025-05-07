@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/Layout/Header";
+import Footer from "@/components/Layout/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Deepak Kumar - Full-Stack Developer",
-  description: "Professional portfolio of Deepak Kumar, a Full-Stack Developer specializing in modern web technologies.",
+  title: "Deepak Kumar - Full Stack Developer",
+  description: "Portfolio website showcasing my work in web development, mobile apps, and design.",
 };
 
 export default function RootLayout({
@@ -25,14 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Header />
-        <div className="pt-20">
-          {children}
-        </div>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>
