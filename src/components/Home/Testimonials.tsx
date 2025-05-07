@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { FaQuoteLeft, FaStar, FaStarHalf, FaChevronLeft, FaChevronRight, FaUser } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
-import type { Engine } from 'tsparticles-engine';
+import { Engine } from '@tsparticles/engine';
 import Image from 'next/image';
 
 // Star rating component

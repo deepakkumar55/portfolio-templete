@@ -2,7 +2,7 @@
 import React from 'react';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
-import type { Engine } from 'tsparticles-engine';
+import { Engine } from '@tsparticles/engine';
 
 interface ParticlesBackgroundProps {
   id: string;

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { FaTimes, FaCamera, FaImage } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
-import type { Engine } from 'tsparticles-engine';
+import { Engine } from '@tsparticles/engine';
 
 // Terminal-style section description
 const TerminalDescription: React.FC<{ text: string }> = ({ text }) => {

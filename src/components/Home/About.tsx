@@ -4,7 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { FaCode, FaServer, FaMobileAlt, FaDesktop, FaDatabase, FaCog, FaCalendarAlt, FaGraduationCap, FaBriefcase } from 'react-icons/fa';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
-import type { Engine } from 'tsparticles-engine';
+import { Engine } from '@tsparticles/engine';
 
 // Skill component with cyberpunk-style progress bar
 const Skill: React.FC<{ 

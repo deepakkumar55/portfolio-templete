@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
-import type { Engine } from 'tsparticles-engine';
+import { Engine } from '@tsparticles/engine';
 import { 
   SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiHtml5, SiCss3,
   SiTailwindcss, SiNodedotjs, SiExpress, SiMongodb, SiPostgresql, SiPrisma,
