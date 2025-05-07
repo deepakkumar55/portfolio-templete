@@ -172,7 +172,10 @@ const TechStack: React.FC = () => {
             ...baseParticlesConfig.particles,
             color: { value: "#a855f7" },
             number: { density: { enable: true, area: 1200 }, value: 50 },
-            speed: 0.7,
+            move: {
+              ...baseParticlesConfig.particles.move,
+              speed: 0.7,
+            }
           }
         }}
         className="absolute inset-0 z-0"

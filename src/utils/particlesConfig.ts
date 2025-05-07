@@ -1,5 +1,7 @@
 import { Engine } from "@tsparticles/engine";
 import { loadAll } from "@tsparticles/all";
+import type { RecursivePartial } from "@tsparticles/engine";
+import type { IOptions, MoveDirection, OutMode } from "@tsparticles/engine";
 
 // Shared initialization function
 export const particlesInit = async (engine: Engine): Promise<void> => {
@@ -7,7 +9,7 @@ export const particlesInit = async (engine: Engine): Promise<void> => {
 };
 
 // Base configuration that can be customized per component
-export const baseParticlesConfig = {
+export const baseParticlesConfig: RecursivePartial<IOptions> = {
   fullScreen: { enable: false },
   background: { color: { value: "#0a0a0a" } },
   fpsLimit: 120,
@@ -21,9 +23,11 @@ export const baseParticlesConfig = {
       width: 1
     },
     move: {
-      direction: "none",
+      direction: "none" as MoveDirection,
       enable: true,
-      outModes: { default: "bounce" },
+      outModes: { 
+        default: "bounce" as OutMode
+      },
       random: true,
       speed: 0.6,
       straight: false,

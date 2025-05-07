@@ -189,10 +189,14 @@ const Services: React.FC = () => {
             ...baseParticlesConfig.particles,
             color: { value: "#a855f7" },
             links: {
+              ...baseParticlesConfig.particles.links,
               color: "#6366f1",
               distance: 200,
             },
-            speed: 0.8,
+            move: {
+              ...baseParticlesConfig.particles.move,
+              speed: 0.8,
+            },
             number: { density: { enable: true, area: 1000 }, value: 60 },
           }
         }}

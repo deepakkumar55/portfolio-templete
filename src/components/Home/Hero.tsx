@@ -86,7 +86,10 @@ const Hero: React.FC = () => {
             number: { density: { enable: true, area: 800 }, value: 80 },
             opacity: { value: 0.3 },
             size: { value: { min: 1, max: 3 } },
-            speed: 1,
+            move: {
+              ...baseParticlesConfig.particles.move,
+              speed: 1,
+            }
           },
           interactivity: {
             events: {
